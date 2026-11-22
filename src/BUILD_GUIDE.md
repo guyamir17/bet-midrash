@@ -38,3 +38,10 @@
 - כל טענה על מקור – רק אחרי שקראת את הטקסט שלו (ספריא). מה שלא בדקת – לא לכתוב, או לסמן "לבדוק".
 - ציטוטים – רק מהטקסט שנשלף. ילקוט יוסף ופוסקים אחרונים שאינם בספריא – רק בסיכום, עם ציון המקור המשני.
 - אחרי הבנייה: לפתוח את האפליקציה בדפדפן headless (playwright + /usr/bin/google-chrome), לצלם מסך של סעיף ושל שרטוט, ולוודא שאין שגיאות.
+
+## פסקי הרב יעקב אריאל – "אוהלי הלכה" (שדה `ariel`)
+Guy supplied the book "אוהלי הלכה – הלכות חנוכה" (rulings of Rav Yaakov Ariel; for Ashkenazim and Sephardim). It is a key practical source.
+- `src/content/ariel_digest.json` holds a paraphrased digest of the book's rulings, by siman (673–683), each with a chapter/section ref; `own: true` marks rulings the book explicitly labels "הכרעת הגר"י אריאל".
+- For each seif, add `ariel: [{t, ref, own?}]` with the relevant rulings (move each digest item to the seif it belongs to; reword if needed, never quote at length). The app shows them in "פוסקי זמננו" under the label "הרב אריאל", with a badge for `own`.
+- Use the book's rulings to strengthen the practice section (rules + cases), naming him as the source. Where he differs from Yalkut Yosef / MB, say so explicitly in `yy_note` or the practice rules.
+- The book text itself is NOT in the repo (copyright; the repo is public). Do not add it.

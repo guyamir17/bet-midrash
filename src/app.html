@@ -69,7 +69,7 @@ h2{font-family:"Frank Ruhl Libre",serif;font-size:21px;margin:26px 0 10px}
 .src .hd a{margin-inline-start:auto;font-size:12px;text-decoration:none}
 .tag{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px}
 .tag.talmud{background:#efe6f7;color:#5b2d82}.tag.rishon{background:#e6eef6;color:#1f4e79}.tag.rambam{background:#f6ecd8;color:#8a5a0f}
-.tag.tur{background:#e9ecef;color:#3d4650}.tag.sa{background:#1f4e79;color:#fff}.tag.ach{background:#e9f3ec;color:#2f6b4f}.tag.yy{background:#f8e9df;color:#8a3b12}
+.tag.tur{background:#e9ecef;color:#3d4650}.tag.sa{background:#1f4e79;color:#fff}.tag.ach{background:#e9f3ec;color:#2f6b4f}.tag.yy{background:#f8e9df;color:#8a3b12}.tag.ar{background:#e6eefa;color:#1f4e79}.own{display:inline-block;font-size:12px;background:#1f4e79;color:#fff;border-radius:6px;padding:0 6px;margin-inline-end:4px}.aref{color:var(--muted);font-size:13px}
 .txt{font-family:"Frank Ruhl Libre",serif;font-size:var(--fs);line-height:1.75;padding:12px 14px}
 .txt small{font-size:.9em}
 .clamp{max-height:9.5em;overflow:hidden;position:relative}
@@ -493,7 +493,7 @@ function viewSeif(n, i){
   if(x.by.length) steps.push(["by","טור ובית יוסף"]);
   steps.push(["sa","שו״ע ורמ״א"]);
   if(x.comm.length) steps.push(["ach","נושאי כלים"]);
-  if(x.yy.length || x.ph.length) steps.push(["yy","פוסקי זמננו"]);
+  if(x.yy.length || x.ph.length || (x.ariel||[]).length) steps.push(["yy","פוסקי זמננו"]);
   if(x.practice && x.practice.rules.length) steps.push(["prac","למעשה"]);
   steps.push(["quiz","חזרה"]); steps.push(["ask","שאל"]);
   let html = `
@@ -527,11 +527,14 @@ function viewSeif(n, i){
       <div class="tabs" id="ctabs">${x.comm.map((c,j)=>`<button data-c="${j}" class="${j===0?"on":""}">${esc(c.label)} <span class="muted" style="font-weight:400">${c.pieces.filter(p=>!p.bg).length}</span>${c.noted?` <span title="יש הערות" style="color:var(--note)">●</span>`:""}</button>`).join("")}</div>
       <div id="cbody"></div></section>`;
   }
-  if(x.yy.length || x.ph.length){
+  if(x.yy.length || x.ph.length || (x.ariel||[]).length){
     html += `<section class="step" id="st-yy"><div class="sh"><span class="n">${++sn}</span><h3>פוסקי זמננו</h3></div>
       ${x.yy.length ? `<div class="src"><div class="hd"><span class="tag yy">ילקוט יוסף</span><span class="lab">פסקי ילקוט יוסף – בסיכום</span></div>
         <ul class="yy">${x.yy.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
         <div class="srcline">מקור הסיכום: <a href="${esc((x.yy_src||DATA.yy_src).url)}" target="_blank" rel="noopener">${esc((x.yy_src||DATA.yy_src).label)}</a>. זה סיכום בלשון אחרת ולא ציטוט; לפני שמורים הלכה, יש לבדוק בילקוט יוסף עצמו.</div></div>` : ""}
+      ${(x.ariel||[]).length ? `<div class="src"><div class="hd"><span class="tag ar">הרב אריאל</span><span class="lab">אוהלי הלכה – פסקי הרב יעקב אריאל, בסיכום</span></div>
+        <ul class="yy">${x.ariel.map(a=>`<li>${a.own?'<span class="own">הכרעת הרב אריאל</span> ':''}${esc(a.t)} <span class="aref">(${esc(a.ref)})</span></li>`).join("")}</ul>
+        <div class="srcline">מקור: אוהלי הלכה – הלכות חנוכה (מכון התורה והארץ, תשפ"ב). סיכום בלשון אחרת, לא ציטוט.</div></div>` : ""}
       ${note("שים לב", x.yy_note, "warn")}
       ${x.ph.map(z=>srcCard({tag:"ach",tagText:"פניני הלכה",label:"פניני הלכה",place:z.place,url:z.url,html:z.text})).join("")}
     </section>`;
@@ -594,6 +597,7 @@ function seifContext(s, x){
   if(x.by.length) c += `[בית יוסף]\n${x.by.map(b=>strip(b.text)).join("\n")}\n\n`;
   x.comm.forEach(cm => { const t = cm.pieces.map(p=>strip(p.text)).join("\n"); c += `[${cm.label}]\n${cm.key==="kh"? t.slice(0,6000) : t}\n\n`; });
   if(x.yy.length) c += `[סיכום פסקי ילקוט יוסף – ממקור משני]\n${x.yy.join("\n")}\n\n`;
+  if((x.ariel||[]).length) c += `[פסקי הרב אריאל – אוהלי הלכה, בסיכום]\n${x.ariel.map(a=>a.t).join("\n")}\n\n`;
   return c.slice(0, 60000);
 }
 function wireAsk(s, x){
