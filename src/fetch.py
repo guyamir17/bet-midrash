@@ -1,6 +1,6 @@
 import json, os, re, sys, time, urllib.parse, subprocess, hashlib
 
-CACHE = "/home/claude/sefaria_cache"
+CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cache")
 os.makedirs(CACHE, exist_ok=True)
 
 def get(path):
