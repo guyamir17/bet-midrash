@@ -192,6 +192,7 @@ function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e)
 P = lsGet("bm-progress", P);
 function saveProgress(){
   lsSet("bm-progress", P);
+  ghSchedule();
   if(!db) return;
   const body = JSON.parse(JSON.stringify(P));
   saving = saving.then(() => db.doc("progress/main").set(body)).catch(() => {});
@@ -223,6 +224,48 @@ function mergeProgress(a, b){
   }
   return out;
 }
+
+
+/* ---------- GitHub progress sync (standalone site) ---------- */
+const GH_API = "https://api.github.com/repos/guyamir17/bet-midrash/contents/progress.json";
+const GH_BRANCH = "progress";
+let GH = lsGet("bm-gh", null), ghSha = null, ghTimer = null, ghState = GH ? "…" : "off";
+function ghHeaders(){ return {"Authorization":"Bearer "+GH.token, "Accept":"application/vnd.github+json"}; }
+function b64(str){ return btoa(unescape(encodeURIComponent(str))); }
+function unb64(b){ return decodeURIComponent(escape(atob(b.replace(/\n/g,"")))); }
+function ghSet(st){ ghState = st; const el = $("#ghStatus"); if(el) el.innerHTML = ghStatusHtml(); }
+async function ghPull(){
+  if(!GH) return false;
+  const r = await fetch(GH_API+"?ref="+GH_BRANCH+"&t="+Date.now(), {headers:ghHeaders(), cache:"no-store"});
+  if(r.status === 401 || r.status === 403){ ghSet("auth"); return false; }
+  if(r.status === 404){ ghSha = null; return true; }
+  if(!r.ok){ ghSet("err"); return false; }
+  const j = await r.json(); ghSha = j.sha;
+  try{ const remote = JSON.parse(unb64(j.content)); if(remote && remote.seifim){ P = mergeProgress(remote, P); lsSet("bm-progress", P); } }catch(e){}
+  return true;
+}
+async function ghPush(retry){
+  if(!GH) return;
+  ghSet("…");
+  try{
+    const body = {message:"progress", branch:GH_BRANCH, content:b64(JSON.stringify(P, null, 1))};
+    if(ghSha) body.sha = ghSha;
+    const r = await fetch(GH_API, {method:"PUT", headers:{...ghHeaders(), "Content-Type":"application/json"}, body:JSON.stringify(body)});
+    if(r.ok){ ghSha = (await r.json()).content.sha; ghSet("ok"); return; }
+    if((r.status === 409 || r.status === 422) && !retry){ if(await ghPull()) return ghPush(true); return; }
+    ghSet(r.status === 401 || r.status === 403 ? "auth" : "err");
+  }catch(e){ ghSet("err"); }
+}
+function ghSchedule(){ if(!GH) return; clearTimeout(ghTimer); ghTimer = setTimeout(()=>ghPush(false), 1500); }
+async function ghSync(){
+  if(!GH) return;
+  ghSet("…");
+  try{ const before = JSON.stringify(P); if(await ghPull()){ ghSet("ok"); if(JSON.stringify(P) !== before){ render(); ghSchedule(); } } }catch(e){ ghSet("err"); }
+}
+function ghStatusHtml(){
+  return ({off:"לא מסונכרן – ההתקדמות נשמרת רק בדפדפן הזה", "…":"מסנכרן…", ok:"✓ מסונכרן עם גיטהאב", auth:"⚠ המפתח לא תקף או פג תוקף – יש להזין מפתח חדש", err:"⚠ אין חיבור לגיטהאב כרגע – ינסה שוב"})[ghState] || "";
+}
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") ghSync(); });
 
 /* ---------- helpers ---------- */
 function toast(t){ const el = $("#toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove("on"), 1800); }
@@ -348,6 +391,7 @@ function render(){
   let m;
   if(h === "review") return viewReview();
   if(h === "shiurim") return viewShiurim();
+  if(h === "sync") return viewSync();
   if((m = h.match(/^sum-(\d+)$/))) return viewSummary(+m[1]);
   if((m = h.match(/^shiur-(\d+)/))) return viewSummary(+m[1]);
   if((m = h.match(/^s(\d+)-(\d+)$/))) return viewSeif(+m[1], +m[2]);
@@ -377,7 +421,46 @@ function viewHome(){
       const done = s.seifim.filter(x => P.seifim[key(s.n,x.n)]?.learned).length;
       return `<a class="item" href="#s${s.n}"><div class="num">${s.he}</div><div><div style="font-weight:700">${esc(s.title)}</div><div class="meta">${s.seifim.length} סעיפים</div></div><div class="check">${done}/${s.seifim.length}</div></a>`;
     }).join("")}</div>
+    ${window.claude ? "" : `<a class="card" href="#sync" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit"><div class="num">⇅</div><div><div style="font-weight:700">סנכרון בין מכשירים</div><div class="meta" id="ghStatus" style="font-size:13px;color:var(--muted)">${ghStatusHtml()}</div></div><div class="check" style="color:var(--accent)">›</div></a>`}
     <p class="muted" style="font-size:13px">הטקסטים מובאים כלשונם מספריא. דברי הפתיחה, הביאורים, השאלות ותשובות "שאל את Claude" נכתבו בידי Claude. סיכום פסקי ילקוט יוסף לקוח ממקור משני, ומומלץ לבדוק אותו בספר.</p>`;
+}
+
+
+function viewSync(){
+  $("#hdrTitle").innerHTML = `סנכרון <small>בין מכשירים</small>`;
+  $("#app").innerHTML = `
+    <div class="crumbs"><a href="#home">ראשי</a> › סנכרון</div>
+    <h1>סנכרון ההתקדמות</h1>
+    <div class="card"><b>מצב:</b> <span id="ghStatus">${ghStatusHtml()}</span></div>
+    <div class="card">
+      <p>ההתקדמות נשמרת בקובץ במאגר שלך בגיטהאב, וכל מכשיר שהוזן בו המפתח קורא וכותב אליו.</p>
+      <p><b>פעם אחת – יצירת המפתח:</b></p>
+      <ol style="padding-inline-start:20px;margin:0">
+        <li>פתח <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">את דף יצירת המפתח בגיטהאב</a>.</li>
+        <li>בשם המפתח כתוב: בית מדרש. בתוקף (Expiration) בחר שנה.</li>
+        <li>תחת Repository access בחר Only select repositories, ובחר את bet-midrash.</li>
+        <li>תחת Permissions › Repository permissions, ליד Contents בחר Read and write.</li>
+        <li>לחץ Generate token והעתק את המפתח (מתחיל ב־github_pat_).</li>
+      </ol>
+      <p style="margin-top:10px"><b>בכל מכשיר:</b> הדבק את המפתח כאן ולחץ חבר. אפשר לשמור את המפתח בצד (למשל בהערה בטלפון) כדי להדביק אותו גם במכשירים הבאים.</p>
+      <input id="ghTok" type="password" dir="ltr" placeholder="github_pat_..." style="width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;margin:6px 0" value="">
+      <div class="row">
+        <button class="btn" id="ghSave">חבר</button>
+        ${GH ? `<button class="btn ghost" id="ghNow">סנכרן עכשיו</button><button class="btn ghost" id="ghOff">נתק במכשיר הזה</button>` : ""}
+      </div>
+      <p class="muted" style="font-size:13px">המפתח נשמר רק בדפדפן הזה ומאפשר גישה למאגר bet-midrash בלבד. ההתקדמות שבגרסת קלוד של האפליקציה נשמרת בנפרד.</p>
+    </div>`;
+  $("#ghSave").onclick = async () => {
+    const t = $("#ghTok").value.trim();
+    if(!t) return toast("הדבק מפתח");
+    GH = {token:t}; ghSha = null;
+    ghSet("…");
+    const ok = await ghPull().catch(()=>false);
+    if(!ok){ const st = ghState; GH = lsGet("bm-gh", null); ghSet(st === "…" ? "err" : st); return toast("החיבור נכשל – בדוק את המפתח"); }
+    lsSet("bm-gh", GH); await ghPush(false); toast("מחובר"); render();
+  };
+  if($("#ghNow")) $("#ghNow").onclick = async () => { await ghSync(); await ghPush(false); toast("סונכרן"); };
+  if($("#ghOff")) $("#ghOff").onclick = () => { try{ localStorage.removeItem("bm-gh"); }catch(e){} GH = null; ghSet("off"); render(); };
 }
 
 function viewSiman(n){
@@ -608,6 +691,7 @@ function viewReview(){
 /* ---------- boot ---------- */
 Promise.resolve(JSON.parse(document.getElementById("bm-data").textContent)).then(d => { DATA = d; render(); }).catch(() => { $("#app").innerHTML = `<p class="empty">לא הצלחתי לטעון את הטקסטים.</p>`; });
 initCaps();
+ghSync();
 </script>
 </body>
 </html>
