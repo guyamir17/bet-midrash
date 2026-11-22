@@ -29,6 +29,12 @@ def place(ref):
     m = re.search(r"Rif (\w[\w ]*?) (\d+)([ab])", ref)
     if m and m.group(1) in TRACT:
         return f"{TRACT[m.group(1)]} {heb_num(int(m.group(2)))} {'ע\"א' if m.group(3)=='a' else 'ע\"ב'} בדפי הרי\"ף"
+    m = re.search(r"Ran on (\w[\w ]*?) (\d+)([ab])", ref)
+    if m and m.group(1) in TRACT:
+        return f"{TRACT[m.group(1)]} {heb_num(int(m.group(2)))} {'ע\"א' if m.group(3)=='a' else 'ע\"ב'} בדפי הרי\"ף"
+    m = re.search(r"Tractate Soferim (\d+):(\d+)", ref)
+    if m:
+        return f"מסכת סופרים {heb_num(int(m.group(1)))}, {heb_num(int(m.group(2)))}"
     m = re.search(r"Rosh on (\w[\w ]*?) (\d+):(\d+)", ref)
     if m and m.group(1) in TRACT:
         return f"{TRACT[m.group(1)]} פרק {heb_num(int(m.group(2)))} סימן {heb_num(int(m.group(3)))}"
