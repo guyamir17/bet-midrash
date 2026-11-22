@@ -448,7 +448,7 @@ function viewSeif(n, i){
     html += `<section class="step" id="st-yy"><div class="sh"><span class="n">${++sn}</span><h3>פוסקי זמננו</h3></div>
       ${x.yy.length ? `<div class="src"><div class="hd"><span class="tag yy">ילקוט יוסף</span><span class="lab">פסקי ילקוט יוסף – בסיכום</span></div>
         <ul class="yy">${x.yy.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
-        <div class="srcline">מקור הסיכום: <a href="${esc(DATA.yy_src.url)}" target="_blank" rel="noopener">${esc(DATA.yy_src.label)}</a>. זה סיכום בלשון אחרת ולא ציטוט; לפני שמורים הלכה, יש לבדוק בילקוט יוסף עצמו.</div></div>` : ""}
+        <div class="srcline">מקור הסיכום: <a href="${esc((x.yy_src||DATA.yy_src).url)}" target="_blank" rel="noopener">${esc((x.yy_src||DATA.yy_src).label)}</a>. זה סיכום בלשון אחרת ולא ציטוט; לפני שמורים הלכה, יש לבדוק בילקוט יוסף עצמו.</div></div>` : ""}
       ${note("שים לב", x.yy_note, "warn")}
       ${x.ph.map(z=>srcCard({tag:"ach",tagText:"פניני הלכה",label:"פניני הלכה",place:z.place,url:z.url,html:z.text})).join("")}
     </section>`;

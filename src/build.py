@@ -109,7 +109,7 @@ def build_siman(C):
             "by_summary": [t for j, t in enumerate(bsum) if j not in bsum_bg_idx],
             "by_summary_bg": [t for j, t in enumerate(bsum) if j in bsum_bg_idx],
             "sa": text, "after_sa": sc["after_sa"], "comm": cm, "after_comm": sc["after_comm"],
-            "concepts": sc.get("concepts", []), "yy": sc.get("yy", []), "yy_note": sc.get("yy_note", ""), "ph": phs,
+            "concepts": sc.get("concepts", []), "yy": sc.get("yy", []), "yy_note": sc.get("yy_note", ""), "yy_src": sc.get("yy_src"), "ph": phs,
             "practice": sc.get("practice") or {"rules": [], "cases": []}, "questions": sc.get("questions", []),
             "figures": sc.get("figures", []),
             **({"bg": {"title": bgc["title"], "intro": bgc["intro"]}} if bgc else {}),
