@@ -495,6 +495,7 @@ function viewSeif(n, i){
   steps.push(["sa","שו״ע ורמ״א"]);
   if(x.comm.length) steps.push(["ach","נושאי כלים"]);
   if(x.yy.length || x.ph.length || (x.ariel||[]).length) steps.push(["yy","פוסקי זמננו"]);
+  steps.push(["ov","סיכום"]);
   if(x.practice && x.practice.rules.length) steps.push(["prac","למעשה"]);
   steps.push(["quiz","חזרה"]); steps.push(["ask","שאל"]);
   let html = `
@@ -540,11 +541,10 @@ function viewSeif(n, i){
       ${x.ph.map(z=>srcCard({tag:"ach",tagText:"פניני הלכה",label:"פניני הלכה",place:z.place,url:z.url,html:z.text})).join("")}
     </section>`;
   }
-  if(x.overview && x.overview.length){
-    html += `<section class="step" id="st-ov"><div class="sh"><span class="n">${++sn}</span><h3>סיכום הסוגיה</h3></div>
-      <div class="card ov">${x.overview.map(o=>`<div class="ovi"><b>${esc(o.h)}</b><div>${esc(o.t)}</div></div>`).join("")}</div>
-    </section>`;
-  }
+  { const z = ((DATA.summaries[String(n)]||{}).seifim||{})[String(x.n)];
+    if(z) html += `<section class="step" id="st-ov"><div class="sh"><span class="n">${++sn}</span><h3>סיכום הסוגיה</h3></div>
+      <div class="card" style="padding:4px 14px">${CHAIN.filter(([k]) => z[k]).map(([k,l,tag]) => `<div class="crow ${k==="lemaase"?"lm":""}"><span class="tag ${tag}">${l}</span><div>${esc(z[k])}</div></div>`).join("")}</div>
+    </section>`; }
   if(x.practice && x.practice.rules.length){
     html += `<section class="step" id="st-prac"><div class="sh"><span class="n" style="background:var(--warn)">${++sn}</span><h3>הלכה למעשה</h3></div>
       <div class="card prac"><ul>${x.practice.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>

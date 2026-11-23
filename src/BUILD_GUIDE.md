@@ -45,3 +45,10 @@ Guy supplied the book "אוהלי הלכה – הלכות חנוכה" (rulings o
 - For each seif, add `ariel: [{t, ref, own?}]` with the relevant rulings (move each digest item to the seif it belongs to; reword if needed, never quote at length). The app shows them in "פוסקי זמננו" under the label "הרב אריאל", with a badge for `own`.
 - Use the book's rulings to strengthen the practice section (rules + cases), naming him as the source. Where he differs from Yalkut Yosef / MB, say so explicitly in `yy_note` or the practice rules.
 - The book text itself is NOT in the repo (copyright; the repo is public). Do not add it.
+
+## סיכום הסוגיה – mandatory for every seif (Guy's rule: "לא כותבים דבר בלי מקור")
+The seif `summary` chain is shown on each seif page as "סיכום הסוגיה" (and on the summaries page). Rules:
+- Start from the Gemara: the `gemara` row names the speaker and the exact place (e.g. "רבה (שבת כב ע\"א): ..."). If the seif has no Gemara source, cite the earliest source (ברייתא, מסכת סופרים פרק/הלכה, a Rishon) with its place.
+- Every row, and every sentence inside `lemaase`, names its source in parentheses: (שו"ע), (רמ"א), (משנה ברורה ס"ק X), (ילקוט יוסף, בסיכום), (הרב אריאל), etc. Where poskim disagree, say who holds what.
+- No statement without a source you actually read. If you cannot source a practical point, leave it out.
+- The summary should put a tangled sugya in order: the question, each Rishon's reason, what the Tur/BY add and why (e.g. the BY's reinterpretation of a Gemara case), and the practical outcome.
