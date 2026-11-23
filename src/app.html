@@ -541,7 +541,7 @@ function viewSeif(n, i){
     </section>`;
   }
   if(x.overview && x.overview.length){
-    html += `<section class="step" id="st-ov"><div class="sh"><span class="n">${++sn}</span><h3>מבט על הסוגיה</h3></div>
+    html += `<section class="step" id="st-ov"><div class="sh"><span class="n">${++sn}</span><h3>סיכום הסוגיה</h3></div>
       <div class="card ov">${x.overview.map(o=>`<div class="ovi"><b>${esc(o.h)}</b><div>${esc(o.t)}</div></div>`).join("")}</div>
     </section>`;
   }
