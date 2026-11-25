@@ -43,6 +43,7 @@
 Guy supplied the book "אוהלי הלכה – הלכות חנוכה" (rulings of Rav Yaakov Ariel; for Ashkenazim and Sephardim). It is a key practical source.
 - `src/content/ariel_digest.json` holds a paraphrased digest of the book's rulings, by siman (673–683), each with a chapter/section ref; `own: true` marks rulings the book explicitly labels "הכרעת הגר"י אריאל".
 - For each seif, add `ariel: [{t, ref, own?}]` with the relevant rulings (move each digest item to the seif it belongs to; reword if needed, never quote at length). The app shows them in "פוסקי זמננו" under the label "הרב אריאל", with a badge for `own`.
+- Each digest item may carry `ach`: the Acharonim the book cites in its footnotes (שמש ומגן, הרב קנייבסקי, חזון איש, חזון עובדיה, הגרש"ז, הגרי"ש וכו'), in summary. Copy it into the seif's `ariel` item as `ach`; the app shows it under the ruling as "בהערות". Guy values these footnote opinions – keep them.
 - Use the book's rulings to strengthen the practice section (rules + cases), naming him as the source. Where he differs from Yalkut Yosef / MB, say so explicitly in `yy_note` or the practice rules.
 - The book text itself is NOT in the repo (copyright; the repo is public). Do not add it.
 
