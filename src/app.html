@@ -90,6 +90,10 @@ h2{font-family:"Frank Ruhl Libre",serif;font-size:21px;margin:26px 0 10px}
 /* yy */
 ul.yy{margin:0;padding:12px 14px 12px 14px;padding-inline-start:30px}
 ul.yy li{margin:6px 0}
+.flow{padding:4px 0 8px}.fst{display:flex;gap:8px;align-items:stretch}.fsl{flex:0 0 64px;font-size:12px;font-weight:700;color:var(--accent);background:#eef3f9;border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px}
+.fns{flex:1;display:flex;flex-wrap:wrap;gap:6px}.fn{flex:1 1 140px;background:#fff;border:1px solid #ddd6c8;border-radius:8px;padding:6px 8px;font-size:13.5px;line-height:1.45}.fn b{display:block;font-size:13px;color:#2f2a22}
+.fn.k{border:2px solid #a8741a;background:#fffaf0}.fn.r{border:2px solid #1f4e79;background:#f3f7fc}.farr{text-align:center;color:#b9ae98;font-size:12px;margin:2px 0 2px 0;padding-inline-start:72px}
+.fleg{font-size:12px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.fn.sw{flex:0 0 14px;height:14px;padding:0}
 .card.ov{padding:12px 16px}.ovi{margin:10px 0;line-height:1.6}.ovi b{display:block;color:var(--accent);margin-bottom:2px}
 .srcline{font-size:12.5px;color:var(--muted);padding:0 14px 12px}
 /* quiz */
@@ -496,6 +500,7 @@ function viewSeif(n, i){
   if(x.comm.length) steps.push(["ach","נושאי כלים"]);
   if(x.yy.length || x.ph.length || (x.ariel||[]).length) steps.push(["yy","פוסקי זמננו"]);
   steps.push(["ov","סיכום"]);
+  if(x.flow && x.flow.length) steps.push(["flow","תרשים"]);
   if(x.practice && x.practice.rules.length) steps.push(["prac","למעשה"]);
   steps.push(["quiz","חזרה"]); steps.push(["ask","שאל"]);
   let html = `
@@ -545,6 +550,12 @@ function viewSeif(n, i){
     if(z) html += `<section class="step" id="st-ov"><div class="sh"><span class="n">${++sn}</span><h3>סיכום הסוגיה</h3></div>
       <div class="card" style="padding:4px 14px">${CHAIN.filter(([k]) => z[k]).map(([k,l,tag]) => `<div class="crow ${k==="lemaase"?"lm":""}"><span class="tag ${tag}">${l}</span><div>${esc(z[k])}</div></div>`).join("")}</div>
     </section>`; }
+  if(x.flow && x.flow.length){
+    html += `<section class="step" id="st-flow"><div class="sh"><span class="n">${++sn}</span><h3>תרשים זרימה</h3></div>
+      <div class="flow">${x.flow.map((st,i)=>`${i?'<div class="farr">▼</div>':''}<div class="fst"><div class="fsl">${esc(st.s)}</div><div class="fns">${st.n.map(nd=>`<div class="fn ${nd.k?'k':''} ${nd.tr==='r'?'r':''}"><b>${esc(nd.w)}</b><span>${esc(nd.t)}</span></div>`).join("")}</div></div>`).join("")}
+      <div class="fleg"><span class="fn k sw"></span> הקו שהשולחן ערוך הולך בו <span class="fn r sw"></span> קו הרמ"א והאשכנזים</div></div>
+    </section>`;
+  }
   if(x.practice && x.practice.rules.length){
     html += `<section class="step" id="st-prac"><div class="sh"><span class="n" style="background:var(--warn)">${++sn}</span><h3>הלכה למעשה</h3></div>
       <div class="card prac"><ul>${x.practice.rules.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>

@@ -53,3 +53,10 @@ The seif `summary` chain is shown on each seif page as "סיכום הסוגיה"
 - Every row, and every sentence inside `lemaase`, names its source in parentheses: (שו"ע), (רמ"א), (משנה ברורה ס"ק X), (ילקוט יוסף, בסיכום), (הרב אריאל), etc. Where poskim disagree, say who holds what.
 - No statement without a source you actually read. If you cannot source a practical point, leave it out.
 - The summary should put a tangled sugya in order: the question, each Rishon's reason, what the Tur/BY add and why (e.g. the BY's reinterpretation of a Gemara case), and the practical outcome.
+
+## תרשים זרימה – `flow` (mandatory for every seif; Guy asked for it at the end of each sugya)
+`flow: [{s: stage, n: [{w: who, t: short text (≤12 words), k: bool, tr: ""|"r"}]}]`
+- Stages in order, skip empty ones: גמרא → ראשונים → טור ובית יוסף → שולחן ערוך → רמ"א → אחרונים → למעשה.
+- Several nodes in one stage = the different opinions side by side (e.g. רש"י | תוספות | רשב"א).
+- `k: true` marks the line the Shulchan Aruch follows (gold); `tr: "r"` marks the Rema/Ashkenazi line where it splits off (blue). In למעשה, split ספרדים / אשכנזים when they differ.
+- Every node names its source; nothing that is not already in the seif's summary chain. The app renders it as "תרשים זרימה" after "סיכום הסוגיה".
