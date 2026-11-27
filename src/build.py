@@ -69,7 +69,7 @@ def build_siman(C):
                 print("MISSING SOURCE", s["ref"], file=sys.stderr); continue
             k, l = kind_label(s["ref"])
             srcs.append({"kind": k, "label": l, "place": place(s["ref"]), "ref": s["ref"], "url": url(s["ref"]), "text": t,
-                         "ex": excerpt(t, s["excerpt"]) if s.get("excerpt") else "", "pre": s.get("pre", ""), "post": s.get("post", ""),
+                         "ex": excerpt(t, s["excerpt"]) if s.get("excerpt") else "", "pre": s.get("pre", ""), "post": s.get("post", ""), "fold": s.get("fold", False),
                          "bg": s["ref"] in bgc.get("sources", [])})
         # commentaries linked to this seif
         links = links_of(f"Shulchan Arukh, Orach Chayim {n}:{i}")
@@ -117,7 +117,7 @@ def build_siman(C):
             "sa": text, "after_sa": sc["after_sa"], "comm": cm, "after_comm": sc["after_comm"], "overview": sc.get("overview", []), "flow": sc.get("flow", []),
             "concepts": sc.get("concepts", []), "yy": sc.get("yy", []), "ariel": sc.get("ariel", []), "yy_note": sc.get("yy_note", ""), "yy_src": sc.get("yy_src"), "ph": phs,
             "practice": sc.get("practice") or {"rules": [], "cases": []}, "questions": sc.get("questions", []),
-            "figures": sc.get("figures", []),
+            "figures": sc.get("figures", []), "compact": sc.get("compact", False),
             **({"bg": {"title": bgc["title"], "intro": bgc["intro"]}} if bgc else {}),
         })
     return S

@@ -127,6 +127,7 @@ textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:1
 .cnote.post{margin:0 14px 12px}
 .pblock{border-top:1px dashed var(--line)}
 .pblock:first-child{border-top:0}
+details.lsn{margin:2px 0 6px}details.lsn summary{font-size:13px;color:var(--accent);cursor:pointer}
 .bysum ul{margin:8px 0 0;padding-inline-start:20px}
 .bysum li{margin:7px 0;font-size:15.5px}
 .bgbox{border:1px dashed var(--gold);border-radius:12px;padding:8px 10px;margin:14px 0;background:#fbf6ea}
@@ -315,7 +316,7 @@ function renderSrc(z){
 function byCard(list, n, he){
   return srcCard({tag:"tur",tagText:"בית יוסף",label:"בית יוסף",place:"על הטור, סימן "+he,url:`https://www.sefaria.org/Beit_Yosef,_Orach_Chayim.${n}`,html:list.map(b=>b.text).join("<br><br>"), ex: list.some(b=>b.ex) ? list.map(b=>b.ex || b.text.replace(/<[^>]+>/g,"")).join("\n\n") : ""});
 }
-function pieceHtml(p){ return `<div class="pblock">${p.pre?`<div class="cnote">${esc(p.pre)}</div>`:""}<div class="txt">${p.text}</div>${p.post?`<div class="cnote post">${esc(p.post)}</div>`:""}</div>`; }
+function pieceHtml(p, compact){ const w=p.text.replace(/<[^>]+>/g,"").split(/\s+/).length; const fold=compact&&(p.pre||p.post)&&w>45; return `<div class="pblock">${p.pre?`<div class="cnote">${esc(p.pre)}</div>`:""}${fold?`<details class="lsn"><summary>הלשון</summary><div class="txt">${p.text}</div></details>`:`<div class="txt">${p.text}</div>`}${p.post?`<div class="cnote post">${esc(p.post)}</div>`:""}</div>`; }
 function sumCard(list, title){
   return list && list.length ? `<div class="card bysum"><span class="pill">${title}</span><ul>${list.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>` : "";
 }
@@ -510,7 +511,7 @@ function viewSeif(n, i){
   let sn = 0;
   if(x.sources.length){
     html += `<section class="step" id="st-src"><div class="sh"><span class="n">${++sn}</span><h3>מקורות: גמרא, ראשונים ורמב״ם</h3></div>
-      ${x.sources.filter(z=>!z.bg).map(renderSrc).join("")}
+      ${x.sources.filter(z=>!z.bg&&!z.fold).map(renderSrc).join("")}${x.sources.some(z=>z.fold&&!z.bg)?`<details class="bgbox"><summary>מקורות נוספים <span class="muted">(${x.sources.filter(z=>z.fold&&!z.bg).length})</span></summary>${x.sources.filter(z=>z.fold&&!z.bg).map(renderSrc).join("")}</details>`:""}
       ${note("העולה מן המקורות", x.after_sources)}
       ${x.sources.some(z=>z.bg) ? `<details class="bgbox"><summary>${esc(x.bg.title)} <span class="muted">(${x.sources.filter(z=>z.bg).length} מקורות)</span></summary><p class="muted" style="margin:6px 2px 10px;font-size:14px">${esc(x.bg.intro)}</p>${x.sources.filter(z=>z.bg).map(renderSrc).join("")}</details>` : ""}
       </section>`;
@@ -535,14 +536,16 @@ function viewSeif(n, i){
   }
   if(x.yy.length || x.ph.length || (x.ariel||[]).length){
     html += `<section class="step" id="st-yy"><div class="sh"><span class="n">${++sn}</span><h3>פוסקי זמננו</h3></div>
+      ${x.compact?`<details class="bgbox"><summary>פסקי ילקוט יוסף, אוהלי הלכה ופניני הלכה – בהרחבה</summary>`:""}
       ${x.yy.length ? `<div class="src"><div class="hd"><span class="tag yy">ילקוט יוסף</span><span class="lab">פסקי ילקוט יוסף</span></div>
         <ul class="yy">${x.yy.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
         <div class="srcline">מקור: <a href="${esc((x.yy_src||DATA.yy_src).url)}" target="_blank" rel="noopener">${esc((x.yy_src||DATA.yy_src).label)}</a></div></div>` : ""}
       ${(x.ariel||[]).length ? `<div class="src"><div class="hd"><span class="tag ar">הרב אריאל</span><span class="lab">אוהלי הלכה – פסקי הרב יעקב אריאל</span></div>
         <ul class="yy">${x.ariel.map(a=>`<li>${a.own?'<span class="own">הכרעת הרב אריאל</span> ':''}${esc(a.t)} <span class="aref">(${esc(a.ref)})</span>${a.ach?`<div class="ach"><b>בהערות:</b> ${esc(a.ach)}</div>`:""}</li>`).join("")}</ul>
         <div class="srcline">מקור: אוהלי הלכה – הלכות חנוכה (מכון התורה והארץ, תשפ"ב).</div></div>` : ""}
-      ${note("שים לב", x.yy_note, "warn")}
       ${x.ph.map(z=>srcCard({tag:"ach",tagText:"פניני הלכה",label:"פניני הלכה",place:z.place,url:z.url,html:z.text})).join("")}
+      ${x.compact?`</details>`:""}
+      ${note("שים לב", x.yy_note, "warn")}
     </section>`;
   }
   if(x.flow && x.flow.length){
@@ -579,7 +582,7 @@ function viewSeif(n, i){
     const show = j => {
       $("#ctabs").querySelectorAll("button").forEach(b=>b.classList.toggle("on", +b.dataset.c===j));
       const c = x.comm[j];
-      $("#cbody").innerHTML = `<div class="src"><div class="hd"><span class="tag ach">אחרונים</span><span class="lab">${esc(c.label)}</span></div>${c.pieces.filter(p=>!p.bg).map(pieceHtml).join("")}${c.pieces.some(p=>p.bg)?`<details class="bgin"><summary>${c.pieces.filter(p=>p.bg).length} ס״ק נוספים – רקע לסיפור הנס</summary>${c.pieces.filter(p=>p.bg).map(pieceHtml).join("")}</details>`:""}</div>`;
+      $("#cbody").innerHTML = `<div class="src"><div class="hd"><span class="tag ach">אחרונים</span><span class="lab">${esc(c.label)}</span></div>${(x.compact? c.pieces.filter(p=>!p.bg&&(p.pre||p.post)) : c.pieces.filter(p=>!p.bg)).map(p=>pieceHtml(p,x.compact)).join("")}${x.compact&&c.pieces.some(p=>!p.bg&&!p.pre&&!p.post)?`<details class="bgin"><summary>עוד ${c.pieces.filter(p=>!p.bg&&!p.pre&&!p.post).length} ס״ק</summary>${c.pieces.filter(p=>!p.bg&&!p.pre&&!p.post).map(pieceHtml).join("")}</details>`:""}${c.pieces.some(p=>p.bg)?`<details class="bgin"><summary>${c.pieces.filter(p=>p.bg).length} ס״ק נוספים – רקע לסיפור הנס</summary>${c.pieces.filter(p=>p.bg).map(pieceHtml).join("")}</details>`:""}</div>`;
     };
     $("#ctabs").querySelectorAll("button").forEach(b => b.onclick = () => show(+b.dataset.c));
     show(Math.max(0, x.comm.findIndex(c=>c.key==="mb")));
