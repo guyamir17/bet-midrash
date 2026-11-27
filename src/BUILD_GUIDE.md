@@ -60,3 +60,15 @@ The seif `summary` chain is shown on each seif page as "סיכום הסוגיה"
 - Several nodes in one stage = the different opinions side by side (e.g. רש"י | תוספות | רשב"א).
 - `k: true` marks the line the Shulchan Aruch follows (gold); `tr: "r"` marks the Rema/Ashkenazi line where it splits off (blue). In למעשה, split ספרדים / אשכנזים when they differ.
 - Every node names its source; nothing that is not already in the seif's summary chain. The app renders it as "תרשים זרימה" after "סיכום הסוגיה".
+
+## מחלוקות ראשונים – מתי מותר לכתוב "חולק" (Guy's rule, Nov 2026)
+Never infer a dispute between Rishonim from the fact that they say different things. Mark or describe a dispute ONLY when one of these says so explicitly:
+1. the Beit Yosef (or the Tur) presents it as a dispute (e.g. "אבל התוספות כתבו", "ודלא כהרמב"ם", "ולא נהירא");
+2. a Rishon explicitly rejects another in his own words (e.g. the Rashba on Rashi: "ואינו מחוור בעיני");
+3. a reliable website (yeshiva.org.il, etzion.org.il, toraland.org.il, Peninei Halakha, din.org.il etc.) states it – cite the page.
+Otherwise present the views as complementary, without "חולק".
+In `flow`, a stage with a documented dispute gets `"rel": "מחלוקת"` and `"src": "<where the dispute is stated>"`; the app shows "⇄ מחלוקת · מקור: …". Stages without it are read as complementary views.
+Only name a Rishon in a stage if you read his words (in the BY, on Sefaria, or on a cited site).
+
+## Seif page length
+The seif page no longer shows "סיכום הסוגיה"; the `summary` chain is still required (it feeds the summaries page for shiurim). The flow chart is the end-of-seif overview, so make it carry the structure: who says what, where it splits, what the SA follows.
