@@ -426,7 +426,7 @@ function viewHome(){
       return `<a class="item" href="#s${s.n}"><div class="num">${s.he}</div><div><div style="font-weight:700">${esc(s.title)}</div><div class="meta">${s.seifim.length} סעיפים</div></div><div class="check">${done}/${s.seifim.length}</div></a>`;
     }).join("")}</div>
     ${window.claude ? "" : `<a class="card" href="#sync" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit"><div class="num">⇅</div><div><div style="font-weight:700">סנכרון בין מכשירים</div><div class="meta" id="ghStatus" style="font-size:13px;color:var(--muted)">${ghStatusHtml()}</div></div><div class="check" style="color:var(--accent)">›</div></a>`}
-    <p class="muted" style="font-size:13px">הטקסטים מובאים כלשונם מספריא. דברי הפתיחה, הביאורים, השאלות ותשובות "שאל את Claude" נכתבו בידי Claude. סיכום פסקי ילקוט יוסף לקוח ממקור משני, ומומלץ לבדוק אותו בספר.</p>`;
+    <p class="muted" style="font-size:13px">הטקסטים מובאים כלשונם מספריא. דברי הפתיחה, הביאורים, השאלות ותשובות "שאל את Claude" נכתבו בידי Claude.</p>`;
 }
 
 
@@ -506,18 +506,18 @@ function viewSeif(n, i){
     <div class="crumbs"><a href="#home">הלכות חנוכה</a> › <a href="#s${n}">סימן ${s.he}</a> › סעיף ${x.he}</div>
     <h1>${esc(x.title)}</h1>
     <div class="chain" id="chain">${steps.map(([id,t])=>`<a href="#s${n}-${i}" data-go="${id}">${t}</a>`).join("")}</div>
-    ${note("מה לחפש", x.before)}`;
+    ${note("הקדמה", x.before)}`;
   let sn = 0;
   if(x.sources.length){
     html += `<section class="step" id="st-src"><div class="sh"><span class="n">${++sn}</span><h3>מקורות: גמרא, ראשונים ורמב״ם</h3></div>
       ${x.sources.filter(z=>!z.bg).map(renderSrc).join("")}
-      ${note("בקצרה", x.after_sources)}
+      ${note("העולה מן המקורות", x.after_sources)}
       ${x.sources.some(z=>z.bg) ? `<details class="bgbox"><summary>${esc(x.bg.title)} <span class="muted">(${x.sources.filter(z=>z.bg).length} מקורות)</span></summary><p class="muted" style="margin:6px 2px 10px;font-size:14px">${esc(x.bg.intro)}</p>${x.sources.filter(z=>z.bg).map(renderSrc).join("")}</details>` : ""}
       </section>`;
   }
   if(x.by.length){
     html += `<section class="step" id="st-by"><div class="sh"><span class="n">${++sn}</span><h3>טור ובית יוסף</h3></div>
-      ${note("מבט על", x.by_note)}
+      ${note("ביאור", x.by_note)}
       ${byCard(x.by.filter(b=>!b.bg), n, s.he)}
       ${sumCard(x.by_summary, "סיכום הבית יוסף")}
       ${x.by.some(b=>b.bg) ? `<details class="bgbox"><summary>${esc(x.bg.title)}: קושיות הבית יוסף</summary>${byCard(x.by.filter(b=>b.bg), n, s.he)}${sumCard(x.by_summary_bg, "סיכום")}</details>` : ""}
@@ -526,21 +526,21 @@ function viewSeif(n, i){
   }
   html += `<section class="step" id="st-sa"><div class="sh"><span class="n">${++sn}</span><h3>שולחן ערוך ורמ״א</h3></div>
     <div class="src sa"><div class="hd"><span class="tag sa">שו״ע</span><span class="lab">סימן ${s.he} סעיף ${x.he}</span><a href="https://www.sefaria.org/Shulchan_Arukh,_Orach_Chayim.${n}.${i}" target="_blank" rel="noopener">ספריא ↗</a></div><div class="txt">${x.sa}</div></div>
-    ${note("הדגשה", x.after_sa)}${conceptsAfter("sa")}</section>`;
+    ${note("בדברי השולחן ערוך", x.after_sa)}${conceptsAfter("sa")}</section>`;
   if(x.comm.length){
     html += `<section class="step" id="st-ach"><div class="sh"><span class="n">${++sn}</span><h3>נושאי כלים ואחרונים</h3></div>
-      ${note("נקודות מרכזיות", x.after_comm)}
+      ${note("עיקרי דברי האחרונים", x.after_comm)}
       <div class="tabs" id="ctabs">${x.comm.map((c,j)=>`<button data-c="${j}" class="${j===0?"on":""}">${esc(c.label)} <span class="muted" style="font-weight:400">${c.pieces.filter(p=>!p.bg).length}</span>${c.noted?` <span title="יש הערות" style="color:var(--note)">●</span>`:""}</button>`).join("")}</div>
       <div id="cbody"></div></section>`;
   }
   if(x.yy.length || x.ph.length || (x.ariel||[]).length){
     html += `<section class="step" id="st-yy"><div class="sh"><span class="n">${++sn}</span><h3>פוסקי זמננו</h3></div>
-      ${x.yy.length ? `<div class="src"><div class="hd"><span class="tag yy">ילקוט יוסף</span><span class="lab">פסקי ילקוט יוסף – בסיכום</span></div>
+      ${x.yy.length ? `<div class="src"><div class="hd"><span class="tag yy">ילקוט יוסף</span><span class="lab">פסקי ילקוט יוסף</span></div>
         <ul class="yy">${x.yy.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
-        <div class="srcline">מקור הסיכום: <a href="${esc((x.yy_src||DATA.yy_src).url)}" target="_blank" rel="noopener">${esc((x.yy_src||DATA.yy_src).label)}</a>. זה סיכום בלשון אחרת ולא ציטוט; לפני שמורים הלכה, יש לבדוק בילקוט יוסף עצמו.</div></div>` : ""}
-      ${(x.ariel||[]).length ? `<div class="src"><div class="hd"><span class="tag ar">הרב אריאל</span><span class="lab">אוהלי הלכה – פסקי הרב יעקב אריאל, בסיכום</span></div>
+        <div class="srcline">מקור: <a href="${esc((x.yy_src||DATA.yy_src).url)}" target="_blank" rel="noopener">${esc((x.yy_src||DATA.yy_src).label)}</a></div></div>` : ""}
+      ${(x.ariel||[]).length ? `<div class="src"><div class="hd"><span class="tag ar">הרב אריאל</span><span class="lab">אוהלי הלכה – פסקי הרב יעקב אריאל</span></div>
         <ul class="yy">${x.ariel.map(a=>`<li>${a.own?'<span class="own">הכרעת הרב אריאל</span> ':''}${esc(a.t)} <span class="aref">(${esc(a.ref)})</span>${a.ach?`<div class="ach"><b>בהערות:</b> ${esc(a.ach)}</div>`:""}</li>`).join("")}</ul>
-        <div class="srcline">מקור: אוהלי הלכה – הלכות חנוכה (מכון התורה והארץ, תשפ"ב). סיכום בלשון אחרת, לא ציטוט.</div></div>` : ""}
+        <div class="srcline">מקור: אוהלי הלכה – הלכות חנוכה (מכון התורה והארץ, תשפ"ב).</div></div>` : ""}
       ${note("שים לב", x.yy_note, "warn")}
       ${x.ph.map(z=>srcCard({tag:"ach",tagText:"פניני הלכה",label:"פניני הלכה",place:z.place,url:z.url,html:z.text})).join("")}
     </section>`;
@@ -557,7 +557,7 @@ function viewSeif(n, i){
       ${x.practice.cases.length ? `<h4 class="ch">שאלות מצויות</h4>${x.practice.cases.map((c,j)=>`<div class="q case" data-j="${j}"><div class="qq">${esc(c.q)}</div><div class="qa" style="font-family:Assistant,sans-serif;font-size:16px">${esc(c.a)}</div><div class="qb"><button class="btn sm ghost reveal">מה התשובה?</button></div></div>`).join("")}` : ""}
     </section>`;
   }
-  html += `<section class="step" id="st-quiz"><div class="sh"><span class="n">${++sn}</span><h3>שאלות שליפה</h3></div>
+  html += `<section class="step" id="st-quiz"><div class="sh"><span class="n">${++sn}</span><h3>שאלות לחזרה</h3></div>
     <p class="muted" style="margin:0 0 6px;font-size:14px">נסה לענות מהזיכרון, ורק אז פתח את התשובה.</p>
     ${x.questions.map((q,j)=>`<div class="q" data-j="${j}"><div class="qq">${j+1}. ${esc(q.q)}</div><div class="qa">${esc(q.a)}</div><div class="qb"><button class="btn sm ghost reveal">הצג תשובה</button></div></div>`).join("")}
     </section>
@@ -608,8 +608,8 @@ function seifContext(s, x){
   x.sources.forEach(z => c += `[${z.label} – ${z.place}]\n${strip(z.text)}\n\n`);
   if(x.by.length) c += `[בית יוסף]\n${x.by.map(b=>strip(b.text)).join("\n")}\n\n`;
   x.comm.forEach(cm => { const t = cm.pieces.map(p=>strip(p.text)).join("\n"); c += `[${cm.label}]\n${cm.key==="kh"? t.slice(0,6000) : t}\n\n`; });
-  if(x.yy.length) c += `[סיכום פסקי ילקוט יוסף – ממקור משני]\n${x.yy.join("\n")}\n\n`;
-  if((x.ariel||[]).length) c += `[פסקי הרב אריאל – אוהלי הלכה, בסיכום]\n${x.ariel.map(a=>a.t).join("\n")}\n\n`;
+  if(x.yy.length) c += `[פסקי ילקוט יוסף]\n${x.yy.join("\n")}\n\n`;
+  if((x.ariel||[]).length) c += `[פסקי הרב אריאל – אוהלי הלכה]\n${x.ariel.map(a=>a.t).join("\n")}\n\n`;
   return c.slice(0, 60000);
 }
 function wireAsk(s, x){

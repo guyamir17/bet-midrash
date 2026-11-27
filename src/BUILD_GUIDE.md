@@ -72,3 +72,8 @@ Only name a Rishon in a stage if you read his words (in the BY, on Sefaria, or o
 
 ## Seif page length
 The seif page no longer shows "סיכום הסוגיה"; the `summary` chain is still required (it feeds the summaries page for shiurim). The flow chart is the end-of-seif overview, so make it carry the structure: who says what, where it splits, what the SA follows.
+
+## Write for the learner (Guy, Nov 2026)
+- Every label, note and heading must be clear to a learner opening the seif cold. No internal jargon ("מה לחפש", "שליפה"). Section labels now: הקדמה · העולה מן המקורות · ביאור (BY) · בדברי השולחן ערוך · עיקרי דברי האחרונים · שאלות לחזרה.
+- Ohalei Halacha is a verified source: everything it cites (חזון עובדיה, ילקוט יוסף, הליכות שלמה, חזון איש, שמש ומגן…) may be cited as verified, always with the exact place (book, volume/page or siman) as given in the book's footnotes – see `ach` in ariel_digest.json.
+- Never write meta-comments to the learner about sourcing ("לא מצאתי מקור", "כדאי לבדוק בספר", "ממקור משני", "סיכום בלשון אחרת"). If there is no reliable source for a Yalkut Yosef ruling, simply leave `yy` empty and say nothing. `yy_note` is only for substantive Sephardi/Ashkenazi differences.
